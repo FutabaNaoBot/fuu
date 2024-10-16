@@ -1,0 +1,5 @@
+plugins:
+  BiliBili-Live:
+    conf:
+      enables: [123]
+      check_duration: 15
