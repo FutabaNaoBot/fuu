@@ -11,7 +11,7 @@ import (
 type AConf struct {
 	PluginPath string `json:"plugin_path"`
 
-	zero.Config
+	Zero zero.Config `json:"zero"`
 }
 
 func (c *AConf) ParseJsonFile(path string) error {

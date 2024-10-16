@@ -10,7 +10,7 @@ import (
 func main() {
 	conf := app.AConf{
 		PluginPath: "./plugins",
-		Config: zero.Config{
+		Zero: zero.Config{
 			NickName:      []string{"bot"},
 			CommandPrefix: "/",
 			SuperUsers:    []int64{123456},

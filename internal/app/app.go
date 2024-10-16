@@ -45,7 +45,7 @@ func (a *App) Start() error {
 		}
 	}
 
-	zero.RunAndBlock(&a.conf.Config, nil)
+	zero.RunAndBlock(&a.conf.Zero, nil)
 	return nil
 
 }
