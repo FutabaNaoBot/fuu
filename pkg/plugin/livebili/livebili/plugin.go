@@ -1,20 +1,20 @@
 package livebili
 
 import (
+	"botgo/pkg/command"
 	"botgo/pkg/plugin"
 	"botgo/pkg/version"
 	zero "github.com/wdvxdr1123/ZeroBot"
 )
 
 type biliPlugin struct {
-	e         *zero.Engine
-	env       plugin.Env
-	liveState map[int64]bool
-	conf      Config
+	e    *zero.Engine
+	env  plugin.Env
+	conf Config
 }
 
 func NewPlugin() plugin.Plugin {
-	return &biliPlugin{liveState: make(map[int64]bool)}
+	return &biliPlugin{}
 }
 
 func (b *biliPlugin) Init(engine *zero.Engine, env plugin.Env) error {
@@ -29,11 +29,11 @@ func (b *biliPlugin) Name() string {
 }
 
 func (b *biliPlugin) Description() string {
-	return "None"
+	return "推送开播信息"
 }
 
-func (b *biliPlugin) Help() string {
-	return "None"
+func (b *biliPlugin) Commands() command.Commands {
+	return command.NewCommands()
 }
 
 func (b *biliPlugin) Version() version.Version {

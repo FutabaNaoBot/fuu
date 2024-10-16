@@ -1,10 +1,12 @@
 package app
 
 import (
+	"botgo/internal/db"
 	"botgo/pkg/plugin"
 	"fmt"
 	"github.com/mitchellh/mapstructure"
 	zero "github.com/wdvxdr1123/ZeroBot"
+	"gorm.io/gorm"
 	"os"
 	"path/filepath"
 	"sync/atomic"
@@ -99,6 +101,14 @@ func (e *Env) GetConf(conf any) error {
 		return fmt.Errorf("解析配置错误: %v", err)
 	}
 	return nil
+}
+
+func (e *Env) GetDB() (*gorm.DB, error) {
+	p, err := e.FilePath()
+	if err != nil {
+		return nil, err
+	}
+	return db.Get(filepath.Join(p, fmt.Sprintf("%s.db", e.p.Name())))
 }
 
 func (e *Env) Toggle(b bool) {

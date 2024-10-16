@@ -1,5 +1,10 @@
 package livebili
 
+type LiveRecord struct {
+	Uid    int64 `gorm:"primaryKey"`
+	IsLive bool
+}
+
 type LiveResp struct {
 	Code    int                 `json:"code"`
 	Msg     string              `json:"msg"`

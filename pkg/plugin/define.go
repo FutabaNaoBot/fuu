@@ -1,8 +1,10 @@
 package plugin
 
 import (
+	"botgo/pkg/command"
 	"botgo/pkg/version"
 	zero "github.com/wdvxdr1123/ZeroBot"
+	"gorm.io/gorm"
 )
 
 type NewPluginFunc = func() Plugin
@@ -12,7 +14,7 @@ type Plugin interface {
 	Init(engine *zero.Engine, env Env) error
 	Name() string
 	Description() string
-	Help() string
+	Commands() command.Commands
 	Version() version.Version
 }
 
@@ -21,5 +23,6 @@ type Env interface {
 	FilePath() (string, error)
 	Rule(r zero.Rule) zero.Rule
 	GetConf(conf any) error
+	GetDB() (*gorm.DB, error)
 	RangeBot(yield func(ctx *zero.Ctx) bool)
 }

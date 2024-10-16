@@ -3,6 +3,7 @@ package app
 import (
 	"botgo/pkg/plugin"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 )
 
@@ -45,7 +46,9 @@ func (a *App) Start() error {
 		}
 	}
 
-	zero.RunAndBlock(&a.conf.Zero, nil)
+	zero.RunAndBlock(&a.conf.Zero, func() {
+		a.PrintPlugins()
+	})
 	return nil
 
 }
@@ -58,5 +61,12 @@ func (a *App) AddPlugin(ps ...plugin.Plugin) {
 			pg = make(map[string]any)
 		}
 		a.envMp[p.Name()] = NewEnv(p, pg)
+	}
+}
+
+func (a *App) PrintPlugins() {
+	for _, p := range a.pluginMp {
+		logrus.Infof("插件 %s | 版本 %s | 描述 %s", p.Name(), p.Version(), p.Description())
+
 	}
 }

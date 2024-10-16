@@ -1,5 +1,6 @@
 plugins:
   BiliBili-Live:
     conf:
-      enables: [123]
-      check_duration: 15
+      check_duration: 5
+      uids: [651707006]
+      groups: [746764900]
