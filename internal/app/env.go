@@ -29,10 +29,12 @@ func NewEnv(p plugin.Plugin, kv map[string]any) *Env {
 }
 
 func (e *Env) Rule(r zero.Rule) zero.Rule {
+
 	return func(ctx *zero.Ctx) bool {
 		if e.disable.Load() {
 			return true
 		}
+
 		return r(ctx)
 	}
 }
@@ -48,17 +50,7 @@ func (e *Env) FilePath() (string, error) {
 }
 
 func (e *Env) RangeBot(yield func(ctx *zero.Ctx) bool) {
-	var set []int64
-	isDisable := true
-
-	if len(e.ids.Disables) > 0 {
-		set = e.ids.Disables
-		isDisable = true
-	}
-	if len(e.ids.Enables) > 0 {
-		set = e.ids.Enables
-		isDisable = false
-	}
+	set, isDisable := e.filterList()
 
 	zero.RangeBot(func(id int64, ctx *zero.Ctx) bool {
 		var found bool
@@ -76,6 +68,21 @@ func (e *Env) RangeBot(yield func(ctx *zero.Ctx) bool) {
 		return yield(ctx)
 
 	})
+}
+
+func (e *Env) filterList() (set []int64, isDisable bool) {
+
+	isDisable = true
+
+	if len(e.ids.Disables) > 0 {
+		set = e.ids.Disables
+		isDisable = true
+	}
+	if len(e.ids.Enables) > 0 {
+		set = e.ids.Enables
+		isDisable = false
+	}
+	return
 }
 
 func (e *Env) GetConf(conf any) error {
