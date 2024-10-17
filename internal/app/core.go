@@ -24,8 +24,9 @@ func newCore(a *App) *Core {
 
 func (c *Core) Init(engine *zero.Engine, env plugin.Env) error {
 	// FIXME 功能待完善。暂时关闭
+	g := env.Groups()
 	return nil
-	engine.OnCommandGroup([]string{"help", "?", "？"}, env.Rule(func(ctx *zero.Ctx) bool {
+	engine.OnCommandGroup([]string{"help", "?", "？"}, g.Rule(func(ctx *zero.Ctx) bool {
 		var builder strings.Builder
 		for _, p := range c.app.pluginMp {
 			if p.Name() == c.Name() {

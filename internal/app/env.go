@@ -3,7 +3,7 @@ package app
 import (
 	"fmt"
 	"github.com/kohmebot/kohme/internal/db"
-	fplugin "github.com/kohmebot/kohme/pkg/plugin"
+	"github.com/kohmebot/kohme/internal/util"
 	"github.com/kohmebot/plugin"
 	"github.com/mitchellh/mapstructure"
 	zero "github.com/wdvxdr1123/ZeroBot"
@@ -14,12 +14,9 @@ import (
 )
 
 type Env struct {
-	kv map[string]any
-	p  plugin.Plugin
-
+	kv      map[string]any
+	p       plugin.Plugin
 	disable atomic.Bool
-
-	ids fplugin.Config
 }
 
 func NewEnv(p plugin.Plugin, kv map[string]any) *Env {
@@ -27,7 +24,6 @@ func NewEnv(p plugin.Plugin, kv map[string]any) *Env {
 		p:  p,
 		kv: kv,
 	}
-	_ = e.GetConf(&e.ids)
 	disable, ok := e.Get("disable").(bool)
 	if ok {
 		e.disable.Store(disable)
@@ -36,16 +32,25 @@ func NewEnv(p plugin.Plugin, kv map[string]any) *Env {
 	return e
 }
 
-func (e *Env) Rule(r zero.Rule) zero.Rule {
-
-	return func(ctx *zero.Ctx) bool {
-
-		if e.disable.Load() {
-			return true
+func (e *Env) Groups() plugin.Groups {
+	vv := e.kv["groups"]
+	switch res := vv.(type) {
+	case []any:
+		i64s, ok := util.AnySliceToInt64(res)
+		if !ok {
+			break
 		}
-
-		return r(ctx)
+		return Groups(i64s)
+	case Groups:
+		return res
+	case []int:
+		return Groups(util.ToInt64Slice(res))
+	case []int32:
+		return Groups(util.ToInt64Slice(res))
+	case []int64:
+		return Groups(res)
 	}
+	return Groups([]int64{})
 }
 
 func (e *Env) Get(key string) any {
@@ -59,39 +64,9 @@ func (e *Env) FilePath() (string, error) {
 }
 
 func (e *Env) RangeBot(yield func(ctx *zero.Ctx) bool) {
-	set, isDisable := e.filterList()
-
 	zero.RangeBot(func(id int64, ctx *zero.Ctx) bool {
-		var found bool
-		for _, target := range set {
-			if target == id {
-				found = true
-				break
-			}
-		}
-		if found && isDisable {
-			return true
-		} else if !found && !isDisable {
-			return true
-		}
 		return yield(ctx)
-
 	})
-}
-
-func (e *Env) filterList() (set []int64, isDisable bool) {
-
-	isDisable = true
-
-	if len(e.ids.Disables) > 0 {
-		set = e.ids.Disables
-		isDisable = true
-	}
-	if len(e.ids.Enables) > 0 {
-		set = e.ids.Enables
-		isDisable = false
-	}
-	return
 }
 
 func (e *Env) GetConf(conf any) error {

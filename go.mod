@@ -3,9 +3,8 @@ module github.com/kohmebot/kohme
 go 1.20
 
 require (
-	github.com/kohmebot/plugin v1.0.1
+	github.com/kohmebot/plugin v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/panjf2000/ants/v2 v2.10.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/wdvxdr1123/ZeroBot v1.7.5
 	gopkg.in/yaml.v3 v3.0.1
@@ -22,7 +21,6 @@ require (
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
-	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/text v0.19.0 // indirect
 )

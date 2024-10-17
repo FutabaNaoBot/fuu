@@ -61,8 +61,12 @@ func (a *App) AddPlugin(ps ...plugin.Plugin) {
 	for _, p := range ps {
 		a.pluginMp[p.Name()] = p
 		pg, ok := a.opt.PluginConf.Plugins[p.Name()]
-		if !ok {
+		if !ok || pg == nil {
 			pg = make(map[string]any)
+		}
+		_, ok = pg["groups"]
+		if !ok {
+			pg["groups"] = a.opt.PluginConf.Groups
 		}
 		a.envMp[p.Name()] = NewEnv(p, pg)
 	}

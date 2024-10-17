@@ -1,6 +1,8 @@
 path: ./plugins
-
+groups: [123]
 plugins:
+  core:
+   # groups: [456]
   livebili:
     conf:
       check_duration: 5

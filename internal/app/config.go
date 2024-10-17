@@ -53,6 +53,7 @@ func (c *AConf) ParseJsonFile(path string) error {
 type PluginConf struct {
 	Path    string                    `yaml:"path"`
 	Plugins map[string]map[string]any `yaml:"plugins"`
+	Groups  []int64                   `yaml:"groups"`
 }
 
 func (c *PluginConf) ParseYamlFile(path string) error {
