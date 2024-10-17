@@ -8,27 +8,29 @@ import (
 )
 
 type App struct {
-	conf    AConf
+	opt option
+
 	Engine  *zero.Engine
 	manager *plugin.Manager
 
 	pluginMp map[string]plugin.Plugin
 	envMp    map[string]*Env
-
-	pluginConf PluginConf
 }
 
-func New(config AConf, opts ...Option) *App {
+func New(opts ...Option) *App {
+	defaultOpt := defaultOption()
+	for _, opt := range opts {
+		opt(&defaultOpt)
+	}
+
 	a := &App{
-		conf:     config,
+		opt:      defaultOpt,
 		Engine:   zero.New(),
-		manager:  plugin.NewPluginManager(config.PluginPath),
+		manager:  plugin.NewPluginManager(defaultOpt.PluginConf.Path),
 		pluginMp: make(map[string]plugin.Plugin),
 		envMp:    make(map[string]*Env),
 	}
-	for _, opt := range opts {
-		opt(a)
-	}
+
 	return a
 }
 
@@ -37,7 +39,7 @@ func (a *App) Start() error {
 	if err != nil {
 		return err
 	}
-	a.AddPlugin(ps...)
+	a.AddPlugin(append(a.opt.DefaultPlugins, ps...)...)
 
 	for _, p := range a.pluginMp {
 		err = p.Init(a.Engine, a.envMp[p.Name()])
@@ -46,7 +48,7 @@ func (a *App) Start() error {
 		}
 	}
 
-	zero.RunAndBlock(&a.conf.Zero, func() {
+	zero.RunAndBlock(&a.opt.AppConf.Zero, func() {
 		a.PrintPlugins()
 	})
 	return nil
@@ -56,7 +58,7 @@ func (a *App) Start() error {
 func (a *App) AddPlugin(ps ...plugin.Plugin) {
 	for _, p := range ps {
 		a.pluginMp[p.Name()] = p
-		pg, ok := a.pluginConf.Plugins[p.Name()]
+		pg, ok := a.opt.PluginConf.Plugins[p.Name()]
 		if !ok {
 			pg = make(map[string]any)
 		}

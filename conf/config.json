@@ -1,8 +1,7 @@
 {
-  "plugin_path": "plugins",
   "zero": {
     "nick_name": ["bot"],
     "command_prefix": "/",
-    "super_users": [1121917292]
+    "super_users": []
   }
 }

@@ -9,7 +9,6 @@ import (
 
 func main() {
 	conf := app.AConf{
-		PluginPath: "./plugins",
 		Zero: zero.Config{
 			NickName:      []string{"bot"},
 			CommandPrefix: "/",
@@ -23,7 +22,7 @@ func main() {
 		},
 	}
 
-	err := conf.ParseJsonFile("./config.json")
+	err := conf.ParseJsonFile("./conf/config.json")
 	if err != nil {
 		panic(err)
 	}
@@ -37,12 +36,13 @@ func main() {
 			},
 		}}
 
-	err = pluginConf.ParseYamlFile("./plugins.yaml")
+	err = pluginConf.ParseYamlFile("./conf/plugins.yaml")
 	if err != nil {
 		panic(err)
 	}
 
-	a := app.New(conf,
+	a := app.New(
+		app.WithAppConf(conf),
 		app.WithPluginConf(pluginConf),
 		app.WithPlugin(livebili.NewPlugin()),
 	)

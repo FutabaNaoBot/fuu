@@ -9,8 +9,6 @@ import (
 )
 
 type AConf struct {
-	PluginPath string `json:"plugin_path"`
-
 	Zero zero.Config `json:"zero"`
 }
 
@@ -30,6 +28,7 @@ func (c *AConf) ParseJsonFile(path string) error {
 }
 
 type PluginConf struct {
+	Path    string                    `yaml:"path"`
 	Plugins map[string]map[string]any `yaml:"plugins"`
 }
 

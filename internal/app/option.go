@@ -2,16 +2,36 @@ package app
 
 import "github.com/futabanaobot/fuu.git/pkg/plugin"
 
-type Option func(app *App)
+type Option func(opt *option)
+
+type option struct {
+	PluginConf     PluginConf
+	AppConf        AConf
+	DefaultPlugins []plugin.Plugin
+}
 
 func WithPlugin(p ...plugin.Plugin) Option {
-	return func(app *App) {
-		app.AddPlugin(p...)
+	return func(opt *option) {
+		opt.DefaultPlugins = append(opt.DefaultPlugins, p...)
 	}
 }
 
 func WithPluginConf(conf PluginConf) Option {
-	return func(app *App) {
-		app.pluginConf = conf
+	return func(opt *option) {
+		opt.PluginConf = conf
+	}
+}
+
+func WithAppConf(conf AConf) Option {
+	return func(opt *option) {
+		opt.AppConf = conf
+	}
+}
+
+func defaultOption() option {
+	return option{
+		PluginConf:     PluginConf{},
+		AppConf:        AConf{},
+		DefaultPlugins: nil,
 	}
 }

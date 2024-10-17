@@ -3,6 +3,8 @@ package plugin
 import (
 	"errors"
 	"fmt"
+	"github.com/futabanaobot/fuu.git/internal/util"
+	"github.com/sirupsen/logrus"
 	"io/fs"
 	"path/filepath"
 	goplugin "plugin"
@@ -17,6 +19,11 @@ func NewPluginManager(dir string) *Manager {
 }
 
 func (m *Manager) LoadPlugins() ([]Plugin, error) {
+	if !util.PathExists(m.dir) {
+		logrus.Warnf("插件目录%s不存在，跳过加载", m.dir)
+		return nil, nil
+	}
+
 	var plugins []Plugin
 	err := filepath.Walk(m.dir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
