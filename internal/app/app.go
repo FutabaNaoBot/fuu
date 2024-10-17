@@ -2,7 +2,8 @@ package app
 
 import (
 	"fmt"
-	"github.com/futabanaobot/fuu.git/pkg/plugin"
+	fplugin "github.com/futabanaobot/fuu/pkg/plugin"
+	"github.com/futabanaobot/plugin"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 )
@@ -11,7 +12,7 @@ type App struct {
 	opt option
 
 	Engine  *zero.Engine
-	manager *plugin.Manager
+	manager *fplugin.Manager
 
 	pluginMp map[string]plugin.Plugin
 	envMp    map[string]*Env
@@ -26,7 +27,7 @@ func New(opts ...Option) *App {
 	a := &App{
 		opt:      defaultOpt,
 		Engine:   zero.New(),
-		manager:  plugin.NewPluginManager(defaultOpt.PluginConf.Path),
+		manager:  fplugin.NewPluginManager(defaultOpt.PluginConf.Path),
 		pluginMp: make(map[string]plugin.Plugin),
 		envMp:    make(map[string]*Env),
 	}

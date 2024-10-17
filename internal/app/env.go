@@ -2,8 +2,9 @@ package app
 
 import (
 	"fmt"
-	"github.com/futabanaobot/fuu.git/internal/db"
-	"github.com/futabanaobot/fuu.git/pkg/plugin"
+	"github.com/futabanaobot/fuu/internal/db"
+	fplugin "github.com/futabanaobot/fuu/pkg/plugin"
+	"github.com/futabanaobot/plugin"
 	"github.com/mitchellh/mapstructure"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"gorm.io/gorm"
@@ -18,7 +19,7 @@ type Env struct {
 
 	disable atomic.Bool
 
-	ids plugin.Config
+	ids fplugin.Config
 }
 
 func NewEnv(p plugin.Plugin, kv map[string]any) *Env {

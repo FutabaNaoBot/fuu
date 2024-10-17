@@ -1,8 +1,7 @@
 package main
 
 import (
-	"github.com/futabanaobot/fuu.git/internal/app"
-	"github.com/futabanaobot/fuu.git/pkg/plugin/livebili/livebili"
+	"github.com/futabanaobot/fuu/internal/app"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
 )
@@ -44,7 +43,6 @@ func main() {
 	a := app.New(
 		app.WithAppConf(conf),
 		app.WithPluginConf(pluginConf),
-		app.WithPlugin(livebili.NewPlugin()),
 	)
 	panic(a.Start())
 }

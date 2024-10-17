@@ -1,6 +1,6 @@
 package app
 
-import "github.com/futabanaobot/fuu.git/pkg/plugin"
+import "github.com/futabanaobot/plugin"
 
 type Option func(opt *option)
 
