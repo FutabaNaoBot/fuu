@@ -28,12 +28,18 @@ func NewEnv(p plugin.Plugin, kv map[string]any) *Env {
 		kv: kv,
 	}
 	_ = e.GetConf(&e.ids)
+	disable, ok := e.Get("disable").(bool)
+	if ok {
+		e.disable.Store(disable)
+	}
+
 	return e
 }
 
 func (e *Env) Rule(r zero.Rule) zero.Rule {
 
 	return func(ctx *zero.Ctx) bool {
+
 		if e.disable.Load() {
 			return true
 		}
