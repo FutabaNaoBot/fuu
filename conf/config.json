@@ -1,7 +1,11 @@
 {
   "zero": {
-    "nick_name": ["bot"],
+    "nick_name": ["kohme","小姬"],
     "command_prefix": "/",
     "super_users": []
+  },
+  "ws": {
+    "url": "ws://127.0.0.1:6700"
   }
+
 }

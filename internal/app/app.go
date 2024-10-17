@@ -40,6 +40,7 @@ func (a *App) Start() error {
 	if err != nil {
 		return err
 	}
+	a.AddPlugin(newCore(a))
 	a.AddPlugin(append(a.opt.DefaultPlugins, ps...)...)
 
 	for _, p := range a.pluginMp {
@@ -48,9 +49,9 @@ func (a *App) Start() error {
 			return fmt.Errorf("%s 初始化失败: %w", p.Name(), err)
 		}
 	}
-
+	a.PrintPlugins()
 	zero.RunAndBlock(&a.opt.AppConf.Zero, func() {
-		a.PrintPlugins()
+
 	})
 	return nil
 

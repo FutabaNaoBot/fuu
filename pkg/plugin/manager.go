@@ -52,10 +52,10 @@ func (m *Manager) LoadPluginsWithFilter(fs ...Filter) ([]plugin.Plugin, error) {
 	if err != nil {
 		return nil, err
 	}
-	for _, plugin := range plugins {
+	for _, p := range plugins {
 		for _, f := range fs {
-			if f(plugin) {
-				res = append(res, plugin)
+			if f(p) {
+				res = append(res, p)
 			}
 		}
 	}

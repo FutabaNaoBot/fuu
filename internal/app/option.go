@@ -32,6 +32,6 @@ func defaultOption() option {
 	return option{
 		PluginConf:     PluginConf{},
 		AppConf:        AConf{},
-		DefaultPlugins: nil,
+		DefaultPlugins: []plugin.Plugin{},
 	}
 }

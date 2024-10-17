@@ -4,12 +4,33 @@ import (
 	"encoding/json"
 	"fmt"
 	zero "github.com/wdvxdr1123/ZeroBot"
+	"github.com/wdvxdr1123/ZeroBot/driver"
 	"gopkg.in/yaml.v3"
 	"os"
 )
 
+type WsConf struct {
+	Url   string `json:"url"`
+	Token string `json:"token"`
+}
+
 type AConf struct {
-	Zero zero.Config `json:"zero"`
+	Zero      zero.Config `json:"zero"`
+	Ws        WsConf      `json:"ws"`
+	ReverseWs WsConf      `json:"rws"`
+}
+
+func (c *AConf) InitDriver() {
+	var ds []zero.Driver
+	if c.Ws.Url != "" {
+		// 正向Ws
+		ds = append(ds, driver.NewWebSocketClient(c.Ws.Url, c.Ws.Token))
+	}
+	if c.ReverseWs.Url != "" {
+		// 反向Ws
+		ds = append(ds, driver.NewWebSocketServer(16, c.ReverseWs.Url, c.ReverseWs.Token))
+	}
+	c.Zero.Driver = ds
 }
 
 func (c *AConf) ParseJsonFile(path string) error {
@@ -23,6 +44,8 @@ func (c *AConf) ParseJsonFile(path string) error {
 	if err := decoder.Decode(c); err != nil {
 		return fmt.Errorf("解析 JSON 文件错误: %w", err)
 	}
+
+	c.InitDriver()
 
 	return nil
 }
