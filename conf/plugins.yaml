@@ -1,7 +1,7 @@
 path: ./plugins
 
 plugins:
-  BiliBili-Live:
+  livebili:
     conf:
       check_duration: 5
       uids: [651707006]

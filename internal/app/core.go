@@ -23,6 +23,8 @@ func newCore(a *App) *Core {
 }
 
 func (c *Core) Init(engine *zero.Engine, env plugin.Env) error {
+	// FIXME 功能待完善。暂时关闭
+	return nil
 	engine.OnCommandGroup([]string{"help", "?", "？"}, env.Rule(func(ctx *zero.Ctx) bool {
 		var builder strings.Builder
 		for _, p := range c.app.pluginMp {
