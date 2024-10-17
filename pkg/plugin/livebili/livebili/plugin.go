@@ -1,9 +1,9 @@
 package livebili
 
 import (
-	"botgo/pkg/command"
-	"botgo/pkg/plugin"
-	"botgo/pkg/version"
+	"github.com/jhue58/botgo/pkg/command"
+	"github.com/jhue58/botgo/pkg/plugin"
+	"github.com/jhue58/botgo/pkg/version"
 	zero "github.com/wdvxdr1123/ZeroBot"
 )
 

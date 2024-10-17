@@ -1,8 +1,8 @@
 package app
 
 import (
-	"botgo/pkg/plugin"
 	"fmt"
+	"github.com/jhue58/botgo/pkg/plugin"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 )

@@ -1,4 +1,4 @@
-module botgo
+module github.com/jhue58/botgo
 
 go 1.20
 

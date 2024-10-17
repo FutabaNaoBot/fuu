@@ -1,8 +1,8 @@
 package plugin
 
 import (
-	"botgo/pkg/command"
-	"botgo/pkg/version"
+	"github.com/jhue58/botgo/pkg/command"
+	"github.com/jhue58/botgo/pkg/version"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"gorm.io/gorm"
 )

@@ -1,9 +1,9 @@
 package app
 
 import (
-	"botgo/internal/db"
-	"botgo/pkg/plugin"
 	"fmt"
+	"github.com/jhue58/botgo/internal/db"
+	"github.com/jhue58/botgo/pkg/plugin"
 	"github.com/mitchellh/mapstructure"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"gorm.io/gorm"
