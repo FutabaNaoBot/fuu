@@ -43,6 +43,7 @@ func main() {
 	a := app.New(
 		app.WithAppConf(conf),
 		app.WithPluginConf(pluginConf),
+		app.WithPlugin(defaultPlugins...),
 	)
 	panic(a.Start())
 }
