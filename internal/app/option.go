@@ -1,6 +1,6 @@
 package app
 
-import "github.com/jhue58/botgo/pkg/plugin"
+import "github.com/futabanaobot/fuu.git/pkg/plugin"
 
 type Option func(app *App)
 

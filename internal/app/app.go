@@ -2,7 +2,7 @@ package app
 
 import (
 	"fmt"
-	"github.com/jhue58/botgo/pkg/plugin"
+	"github.com/futabanaobot/fuu.git/pkg/plugin"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 )

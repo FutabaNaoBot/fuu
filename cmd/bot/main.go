@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/jhue58/botgo/internal/app"
-	"github.com/jhue58/botgo/pkg/plugin/livebili/livebili"
+	"github.com/futabanaobot/fuu.git/internal/app"
+	"github.com/futabanaobot/fuu.git/pkg/plugin/livebili/livebili"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
 )

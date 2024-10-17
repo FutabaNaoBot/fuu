@@ -1,4 +1,4 @@
-module github.com/jhue58/botgo
+module github.com/futabanaobot/fuu.git
 
 go 1.20
 

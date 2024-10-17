@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/jhue58/botgo/pkg/gopool"
+	"github.com/futabanaobot/fuu.git/pkg/gopool"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 	"gorm.io/gorm"
