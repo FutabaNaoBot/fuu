@@ -2,8 +2,8 @@ package app
 
 import (
 	"fmt"
-	fplugin "github.com/futabanaobot/fuu/pkg/plugin"
-	"github.com/futabanaobot/plugin"
+	fplugin "github.com/kohmebot/kohme/pkg/plugin"
+	"github.com/kohmebot/plugin"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 )

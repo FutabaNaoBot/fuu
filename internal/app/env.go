@@ -2,9 +2,9 @@ package app
 
 import (
 	"fmt"
-	"github.com/futabanaobot/fuu/internal/db"
-	fplugin "github.com/futabanaobot/fuu/pkg/plugin"
-	"github.com/futabanaobot/plugin"
+	"github.com/kohmebot/kohme/internal/db"
+	fplugin "github.com/kohmebot/kohme/pkg/plugin"
+	"github.com/kohmebot/plugin"
 	"github.com/mitchellh/mapstructure"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"gorm.io/gorm"

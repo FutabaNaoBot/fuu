@@ -1,6 +1,6 @@
 package app
 
-import "github.com/futabanaobot/plugin"
+import "github.com/kohmebot/plugin"
 
 type Option func(opt *option)
 

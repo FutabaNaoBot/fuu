@@ -1,10 +1,13 @@
 package main
 
 import (
-	"github.com/futabanaobot/fuu/internal/app"
+	"github.com/kohmebot/kohme/internal/app"
+	"github.com/kohmebot/plugin"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
 )
+
+var defaultPlugins []plugin.Plugin
 
 func main() {
 	conf := app.AConf{
@@ -46,4 +49,8 @@ func main() {
 		app.WithPlugin(defaultPlugins...),
 	)
 	panic(a.Start())
+}
+
+func init() {
+	defaultPlugins = plugins()
 }

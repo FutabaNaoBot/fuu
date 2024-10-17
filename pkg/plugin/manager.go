@@ -3,8 +3,8 @@ package plugin
 import (
 	"errors"
 	"fmt"
-	"github.com/futabanaobot/fuu/internal/util"
-	"github.com/futabanaobot/plugin"
+	"github.com/kohmebot/kohme/internal/util"
+	"github.com/kohmebot/plugin"
 	"github.com/sirupsen/logrus"
 	"io/fs"
 	"path/filepath"

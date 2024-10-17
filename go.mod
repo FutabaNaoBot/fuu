@@ -1,9 +1,9 @@
-module github.com/futabanaobot/fuu
+module github.com/kohmebot/kohme
 
 go 1.20
 
 require (
-	github.com/futabanaobot/plugin v1.0.0
+	github.com/kohmebot/plugin v1.0.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/panjf2000/ants/v2 v2.10.0
 	github.com/sirupsen/logrus v1.9.3

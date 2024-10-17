@@ -1,6 +1,6 @@
 package plugin
 
-import "github.com/futabanaobot/plugin"
+import "github.com/kohmebot/plugin"
 
 type Filter func(plugin.Plugin) bool
 
