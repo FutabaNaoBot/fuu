@@ -2,7 +2,9 @@ path: ./plugins
 groups: [123]
 plugins:
   core:
-   # groups: [456]
+   conf:
+     help_top: 下面是小姬的所有本领！
+     help_tail: 更多本领绝赞学习中,加入github.com/KohmeBot来教会我吧！
   livebili:
     conf:
       check_duration: 5
