@@ -1,5 +1,5 @@
 path: ./plugins
-groups: [123]
+groups: []
 plugins:
   core:
    conf:
@@ -7,6 +7,7 @@ plugins:
      help_tail: 更多本领绝赞学习中,加入github.com/KohmeBot来教会我吧！
   livebili:
     conf:
-      check_duration: 5
-      uids: [651707006]
-      groups: [746764900]
+      check_live_duration: 5
+      check_dynamic_duration: 30
+      uids: []
+      cookies: ""
