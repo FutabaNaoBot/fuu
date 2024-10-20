@@ -5,9 +5,24 @@ plugins:
    conf:
      help_top: 下面是小姬的所有本领！
      help_tail: 更多本领绝赞学习中,加入github.com/KohmeBot来教会我吧！
+     test:
+       t: "666"
   livebili:
     conf:
       check_live_duration: 5
       check_dynamic_duration: 30
       uids: []
       cookies: ""
+  manager:
+    conf:
+      sensitive:
+        words: [""]
+        ban_cd: 24
+        recall_tips: 你好像发了什么不得了的东西，被小姬抓住了！
+        ban_tips: 关你小黑屋！
+      join_group:
+        join_group: 欢迎新人喵！
+        join_group_tips: 请遵守群规噢！小姬会一直视奸你的...
+        request_answers: ["nao"]
+        refuse: false
+

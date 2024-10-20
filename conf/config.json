@@ -2,10 +2,10 @@
   "zero": {
     "nick_name": ["kohme","小姬"],
     "command_prefix": "/",
-    "super_users": []
+    "super_users": [1121917292]
   },
   "ws": {
-    "url": "ws://192.168.0.163:3001"
+    "url": "ws://127.0.0.1:3001"
   }
 
 }

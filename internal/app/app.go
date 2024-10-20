@@ -45,7 +45,8 @@ func (a *App) Start() error {
 	a.AddPlugin(newCore(a))
 	a.AddPlugin(append(a.opt.DefaultPlugins, ps...)...)
 
-	for _, p := range a.pluginMp {
+	for _, name := range a.pluginNameSeq {
+		p := a.pluginMp[name]
 		err = p.Init(a.Engine, a.envMp[p.Name()])
 		if err != nil {
 			return fmt.Errorf("%s 初始化失败: %w", p.Name(), err)
@@ -74,13 +75,14 @@ func (a *App) AddPlugin(ps ...plugin.Plugin) {
 		if !ok {
 			pg["groups"] = a.opt.PluginConf.Groups
 		}
+		pg["super_users"] = a.opt.AppConf.Zero.SuperUsers
 		a.envMp[p.Name()] = NewEnv(p, pg)
 	}
 }
 
 func (a *App) PrintPlugins() {
-	for _, p := range a.pluginMp {
+	for _, name := range a.pluginNameSeq {
+		p := a.pluginMp[name]
 		logrus.Infof("插件 %s | 版本 %s | 描述 %s", p.Name(), p.Version(), p.Description())
-
 	}
 }

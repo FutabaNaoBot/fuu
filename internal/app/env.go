@@ -18,11 +18,11 @@ import (
 )
 
 type Env struct {
-	kv         map[string]any
-	p          plugin.Plugin
-	disable    atomic.Bool
-	superUsers Users
-	group      Groups
+	kv        map[string]any
+	p         plugin.Plugin
+	disable   atomic.Bool
+	superUser Users
+	group     Groups
 }
 
 func NewEnv(p plugin.Plugin, kv map[string]any) *Env {
@@ -34,6 +34,7 @@ func NewEnv(p plugin.Plugin, kv map[string]any) *Env {
 	if ok {
 		e.disable.Store(disable)
 	}
+	e.superUser = kv["super_users"].([]int64)
 	e.group = e.groups()
 	return e
 }
@@ -64,7 +65,7 @@ func (e *Env) groups() Groups {
 }
 
 func (e *Env) SuperUser() plugin.Users {
-	return e.superUsers
+	return e.superUser
 }
 
 func (e *Env) Error(ctx *zero.Ctx, err error) {
