@@ -5,8 +5,12 @@ import (
 	"github.com/kohmebot/kohme/internal/db"
 	"github.com/kohmebot/kohme/internal/util"
 	"github.com/kohmebot/plugin"
+	"github.com/kohmebot/plugin/pkg/chain"
+	"github.com/kohmebot/plugin/pkg/gopool"
 	"github.com/mitchellh/mapstructure"
+	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
+	"github.com/wdvxdr1123/ZeroBot/message"
 	"gorm.io/gorm"
 	"os"
 	"path/filepath"
@@ -14,9 +18,11 @@ import (
 )
 
 type Env struct {
-	kv      map[string]any
-	p       plugin.Plugin
-	disable atomic.Bool
+	kv         map[string]any
+	p          plugin.Plugin
+	disable    atomic.Bool
+	superUsers Users
+	group      Groups
 }
 
 func NewEnv(p plugin.Plugin, kv map[string]any) *Env {
@@ -28,11 +34,15 @@ func NewEnv(p plugin.Plugin, kv map[string]any) *Env {
 	if ok {
 		e.disable.Store(disable)
 	}
-
+	e.group = e.groups()
 	return e
 }
 
 func (e *Env) Groups() plugin.Groups {
+	return e.group
+}
+
+func (e *Env) groups() Groups {
 	vv := e.kv["groups"]
 	switch res := vv.(type) {
 	case []any:
@@ -51,6 +61,31 @@ func (e *Env) Groups() plugin.Groups {
 		return Groups(res)
 	}
 	return Groups([]int64{})
+}
+
+func (e *Env) SuperUser() plugin.Users {
+	return e.superUsers
+}
+
+func (e *Env) Error(ctx *zero.Ctx, err error) {
+	logrus.Errorf(fmt.Sprintf("[%s] %v", e.p.Name(), err))
+	var msgChain chain.MessageChain
+	msgChain.Split(
+		message.Text(fmt.Sprintf("Oops！%s发生错误了！", e.p.Name())),
+		message.Text(err.Error()),
+	)
+	gopool.Go(func() {
+		defer func() {
+			if recover() == nil {
+				return
+			}
+			e.group.RangeGroup(func(group int64) bool {
+				ctx.SendGroupMessage(group, msgChain)
+				return true
+			})
+		}()
+		ctx.Send(msgChain)
+	})
 }
 
 func (e *Env) Get(key string) any {

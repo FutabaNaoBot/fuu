@@ -11,7 +11,7 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
-var v = version.NewVersion(0, 0, 1)
+var v = version.NewVersion(0, 0, 2)
 
 type CoreConf struct {
 	HelpTop  string `yaml:"help_top" mapstructure:"help_top"`
@@ -49,17 +49,17 @@ func (c *Core) Init(engine *zero.Engine, env plugin.Env) error {
 func (c *Core) onHelp(engine *zero.Engine, env plugin.Env) error {
 	g := env.Groups()
 	prefix := c.app.opt.AppConf.Zero.CommandPrefix
-	engine.OnCommandGroup([]string{"help", "?", "？", "帮助"}, g.Rule(func(ctx *zero.Ctx) bool {
+	engine.OnCommandGroup([]string{"help", "?", "？", "帮助"}, g.Rule()).Handle(func(ctx *zero.Ctx) {
 		var msgChain chain.MessageChain
 		msgChain.Split(message.Text(c.conf.HelpTop), message.Text(fmt.Sprintf(`命令前缀 "%s"`, prefix)))
 		msgChain.Line()
-		for _, p := range c.app.pluginMp {
-			pEnv := c.app.envMp[p.Name()]
+		for _, name := range c.app.pluginNameSeq {
+			pEnv := c.app.envMp[name]
 			// 跳过关闭的插件
 			if pEnv.disable.Load() {
 				continue
 			}
-
+			p := c.app.pluginMp[name]
 			msgChain.Line(message.Text(fmt.Sprintf("🌟%s (%s)", p.Name(), p.Description())))
 			msgChain.Join(message.Text(p.Commands().String()))
 		}
@@ -67,24 +67,16 @@ func (c *Core) onHelp(engine *zero.Engine, env plugin.Env) error {
 		gopool.Go(func() {
 			ctx.Send(msgChain)
 		})
-
-		return true
-	}))
+	})
 	return nil
 }
 
 func (c *Core) onManager(engine *zero.Engine, env plugin.Env) error {
-	supers := c.app.opt.AppConf.Zero.SuperUsers
-	engine.OnCommand("ping", func(ctx *zero.Ctx) bool {
-		for _, super := range supers {
-			if super == ctx.Event.Sender.ID {
-				gopool.Go(func() {
-					ctx.Send(message.Text("pong!我还活着"))
-				})
-				break
-			}
-		}
-		return true
+	supers := env.SuperUser()
+	engine.OnCommand("ping", supers.Rule()).Handle(func(ctx *zero.Ctx) {
+		gopool.Go(func() {
+			ctx.Send(message.Text("pong!我还活着"))
+		})
 	})
 	return nil
 }
@@ -94,7 +86,7 @@ func (c *Core) Name() string {
 }
 
 func (c *Core) Description() string {
-	return "核心插件"
+	return "基础插件"
 }
 
 func (c *Core) Commands() command.Commands {

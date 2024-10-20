@@ -15,7 +15,9 @@ type App struct {
 	manager *fplugin.Manager
 
 	pluginMp map[string]plugin.Plugin
-	envMp    map[string]*Env
+	// 插件名称序列，这个表明了加载顺序
+	pluginNameSeq []string
+	envMp         map[string]*Env
 }
 
 func New(opts ...Option) *App {
@@ -59,7 +61,11 @@ func (a *App) Start() error {
 
 func (a *App) AddPlugin(ps ...plugin.Plugin) {
 	for _, p := range ps {
+		if _, ok := a.pluginMp[p.Name()]; ok {
+			panic(fmt.Sprintf("存在重复名称的插件: %s", p.Name()))
+		}
 		a.pluginMp[p.Name()] = p
+		a.pluginNameSeq = append(a.pluginNameSeq, p.Name())
 		pg, ok := a.opt.PluginConf.Plugins[p.Name()]
 		if !ok || pg == nil {
 			pg = make(map[string]any)

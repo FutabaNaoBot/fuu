@@ -14,21 +14,22 @@ func (g Groups) RangeGroup(yield func(group int64) bool) {
 	}
 }
 
-func (g Groups) Rule(r zero.Rule) zero.Rule {
+func (g Groups) IsContains(groupId int64) bool {
+	for _, group := range g {
+		if group == groupId {
+			return true
+		}
+	}
+	return false
+}
+
+func (g Groups) Rule() zero.Rule {
 	return func(ctx *zero.Ctx) bool {
-		if ctx == nil || ctx.Event == nil {
-			return r(ctx)
-		}
-		target := ctx.Event.TargetID
-		if target <= 0 {
-			return r(ctx)
-		}
-		for _, group := range g {
-			if group == target {
-				return r(ctx)
-			}
+		groupId := ctx.Event.GroupID
+		if groupId <= 0 {
+			return false
 		}
 
-		return true
+		return g.IsContains(groupId)
 	}
 }
