@@ -1,6 +1,6 @@
 module github.com/kohmebot/kohme
 
-go 1.20
+go 1.23.1
 
 require (
 	github.com/kohmebot/plugin v1.2.1
