@@ -3,7 +3,7 @@ module github.com/kohmebot/kohme
 go 1.23.1
 
 require (
-	github.com/kohmebot/plugin v1.2.1
+	github.com/kohmebot/plugin v1.2.2
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/wdvxdr1123/ZeroBot v1.7.5

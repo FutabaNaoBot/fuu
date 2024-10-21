@@ -54,7 +54,9 @@ func (a *App) Start() error {
 	}
 	a.PrintPlugins()
 	zero.RunAndBlock(&a.opt.AppConf.Zero, func() {
-
+		for _, name := range a.pluginNameSeq {
+			a.pluginMp[name].OnBoot()
+		}
 	})
 	return nil
 

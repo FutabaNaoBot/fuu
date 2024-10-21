@@ -5,8 +5,6 @@ plugins:
    conf:
      help_top: 下面是小姬的所有本领！
      help_tail: 更多本领绝赞学习中,加入github.com/KohmeBot来教会我吧！
-     test:
-       t: "666"
   livebili:
     conf:
       check_live_duration: 5
@@ -21,8 +19,35 @@ plugins:
         recall_tips: 你好像发了什么不得了的东西，被小姬抓住了！
         ban_tips: 关你小黑屋！
       join_group:
+        enable_hello: false
         join_group: 欢迎新人喵！
         join_group_tips: 请遵守群规噢！小姬会一直视奸你的...
         request_answers: ["nao"]
         refuse: false
+  chatai:
+    conf:
+      prompt: "你是小姬,是个女仆,你的主人叫双马尾,与你对话的人是你主人的粉丝,叫直双姬,以下回答你要坚持人设,简短,又贱又可爱,可附带emoji"
+      model_name: "tongyi:qwen-turbo"
+      api_key: ""
+      input_token: 50000
+      output_token: 20000
+      max_tokens: 1000
+      limit_tips: "小姬今天不想理你了..."
+      error_tips: "小姬不是很想理你这句话..."
+      online: false
+      warm_group:
+        enable: true
+        prompt: "你是小姬,群里的人是直双姬,回答要坚持人设,简短可爱撒娇,可以附带emoji"
+        trigger: "群里的人已经%d分钟没有陪你了,发句话撒一下娇"
+        duration: 30
+        groups: []
+        disable_times: [0,9]
+      join_group:
+        enable: true
+        prompt: "你是小姬,你的主人叫双马尾,加群的人是直双姬,是你主人的粉丝,你要求它遵守群规,并且会一直视奸他,回答要简短可爱,有时附带emoji"
+        trigger: '"%s"加群了,欢迎一下他吧,记得说会一直监视他'
+      on_boot:
+        enable: true
+        prompt: "你是小姬,你的主人叫双马尾,群里的人是直双姬,是你主人的粉丝,你说的话幽默滑稽,也很简短可爱,现在你刚死去复活"
+        trigger: "这是你复活后的第一句话,要说的像反派一点"
 

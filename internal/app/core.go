@@ -98,3 +98,7 @@ func (c *Core) Commands() command.Commands {
 func (c *Core) Version() version.Version {
 	return v
 }
+
+func (c *Core) OnBoot() {
+
+}
