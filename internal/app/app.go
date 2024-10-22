@@ -78,6 +78,7 @@ func (a *App) AddPlugin(ps ...plugin.Plugin) {
 			pg["groups"] = a.opt.PluginConf.Groups
 		}
 		pg["super_users"] = a.opt.AppConf.Zero.SuperUsers
+		pg["plugins"] = a.pluginMp
 		a.envMp[p.Name()] = NewEnv(p, pg)
 	}
 }

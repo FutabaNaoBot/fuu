@@ -51,17 +51,17 @@ func (e *Env) groups() Groups {
 		if !ok {
 			break
 		}
-		return Groups(i64s)
+		return i64s
 	case Groups:
 		return res
 	case []int:
-		return Groups(util.ToInt64Slice(res))
+		return util.ToInt64Slice(res)
 	case []int32:
-		return Groups(util.ToInt64Slice(res))
+		return util.ToInt64Slice(res)
 	case []int64:
-		return Groups(res)
+		return res
 	}
-	return Groups([]int64{})
+	return []int64{}
 }
 
 func (e *Env) SuperUser() plugin.Users {
@@ -127,6 +127,16 @@ func (e *Env) GetDB() (*gorm.DB, error) {
 		return nil, err
 	}
 	return db.Get(filepath.Join(p, fmt.Sprintf("%s.db", e.p.Name())))
+}
+
+func (e *Env) GetPlugin(name string) (p plugin.Plugin, ok bool) {
+	val := e.kv["plugins"]
+	mp, ok := val.(map[string]plugin.Plugin)
+	if !ok {
+		return nil, false
+	}
+	p, ok = mp[name]
+	return
 }
 
 func (e *Env) Toggle(b bool) {
