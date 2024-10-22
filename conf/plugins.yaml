@@ -1,6 +1,12 @@
 path: ./plugins
 groups: []
 plugins:
+  chatcount:
+    conf:
+      font: GlowSansSC-Normal-ExtraBold.ttf
+      send_rank_time: 23
+      rank_title_ticker: "报告！这是小姬今天的视奸结果"
+      rank_title_trigger: "今日水群排行"
   core:
    conf:
      help_top: 下面是小姬的所有本领！
