@@ -31,3 +31,24 @@ func (u Users) RangeUser(yield func(user int64) bool) {
 		}
 	}
 }
+
+type UserWithEnv struct {
+	Users
+	env *Env
+}
+
+func NewUserWithEnv(users Users, env *Env) *UserWithEnv {
+	return &UserWithEnv{
+		users, env,
+	}
+}
+
+func (g *UserWithEnv) Rule() zero.Rule {
+	rule := g.Users.Rule()
+	return func(ctx *zero.Ctx) bool {
+		if g.env.disable.Load() {
+			return false
+		}
+		return rule(ctx)
+	}
+}

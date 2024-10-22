@@ -33,3 +33,24 @@ func (g Groups) Rule() zero.Rule {
 		return g.IsContains(groupId)
 	}
 }
+
+type GroupsWithEnv struct {
+	Groups
+	env *Env
+}
+
+func NewGroupsWithEnv(groups Groups, env *Env) *GroupsWithEnv {
+	return &GroupsWithEnv{
+		groups, env,
+	}
+}
+
+func (g *GroupsWithEnv) Rule() zero.Rule {
+	rule := g.Groups.Rule()
+	return func(ctx *zero.Ctx) bool {
+		if g.env.disable.Load() {
+			return false
+		}
+		return rule(ctx)
+	}
+}

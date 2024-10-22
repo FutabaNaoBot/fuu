@@ -22,7 +22,7 @@ type Env struct {
 	p         plugin.Plugin
 	disable   atomic.Bool
 	superUser Users
-	group     Groups
+	group     *GroupsWithEnv
 }
 
 func NewEnv(p plugin.Plugin, kv map[string]any) *Env {
@@ -35,7 +35,7 @@ func NewEnv(p plugin.Plugin, kv map[string]any) *Env {
 		e.disable.Store(disable)
 	}
 	e.superUser = kv["super_users"].([]int64)
-	e.group = e.groups()
+	e.group = NewGroupsWithEnv(e.groups(), e)
 	return e
 }
 
