@@ -48,7 +48,7 @@ func NewGroupsWithEnv(groups Groups, env *Env) *GroupsWithEnv {
 func (g *GroupsWithEnv) Rule() zero.Rule {
 	rule := g.Groups.Rule()
 	return func(ctx *zero.Ctx) bool {
-		if g.env.disable.Load() {
+		if g.env.IsDisable() {
 			return false
 		}
 		return rule(ctx)

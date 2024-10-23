@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	fplugin "github.com/kohmebot/kohme/pkg/plugin"
+	"github.com/kohmebot/kohme/pkg/version"
 	"github.com/kohmebot/plugin"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
@@ -120,6 +121,6 @@ func (a *App) configurePluginEnv(p plugin.Plugin) *Env {
 func (a *App) PrintPlugins() {
 	for _, name := range a.pluginNameSeq {
 		p := a.pluginMp[name]
-		logrus.Infof("插件 %s | 版本 %s | 描述 %s", p.Name(), p.Version(), p.Description())
+		logrus.Infof("插件 %s | 版本 %s | 描述 %s", p.Name(), version.Version(p.Version()), p.Description())
 	}
 }

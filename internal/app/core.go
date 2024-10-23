@@ -2,11 +2,11 @@ package app
 
 import (
 	"fmt"
+	"github.com/kohmebot/kohme/pkg/chain"
+	"github.com/kohmebot/kohme/pkg/command"
+	"github.com/kohmebot/kohme/pkg/gopool"
+	"github.com/kohmebot/kohme/pkg/version"
 	"github.com/kohmebot/plugin"
-	"github.com/kohmebot/plugin/pkg/chain"
-	"github.com/kohmebot/plugin/pkg/command"
-	"github.com/kohmebot/plugin/pkg/gopool"
-	"github.com/kohmebot/plugin/pkg/version"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/extension"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -106,7 +106,7 @@ func (c *Core) onPlugin(engine *zero.Engine, env plugin.Env) error {
 			} else {
 				toggle = "开启"
 			}
-			msgChain.Join(message.Text(fmt.Sprintf("%s v%s (%s)", p.Name(), p.Version().String(), toggle)))
+			msgChain.Join(message.Text(fmt.Sprintf("%s v%s (%s)", p.Name(), version.Version(p.Version()).String(), toggle)))
 			msgChain.Line()
 		}
 		gopool.Go(func() {
@@ -165,14 +165,14 @@ func (c *Core) Description() string {
 	return "基础插件"
 }
 
-func (c *Core) Commands() command.Commands {
+func (c *Core) Commands() fmt.Stringer {
 	return command.NewCommands(
 		command.NewCommand("查看帮助", "help", "?", "帮助"),
 	)
 }
 
-func (c *Core) Version() version.Version {
-	return v
+func (c *Core) Version() uint64 {
+	return uint64(v)
 }
 
 func (c *Core) OnBoot() {

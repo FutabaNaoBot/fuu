@@ -3,9 +3,9 @@ package app
 import (
 	"fmt"
 	"github.com/kohmebot/kohme/internal/db"
+	"github.com/kohmebot/kohme/pkg/chain"
+	"github.com/kohmebot/kohme/pkg/gopool"
 	"github.com/kohmebot/plugin"
-	"github.com/kohmebot/plugin/pkg/chain"
-	"github.com/kohmebot/plugin/pkg/gopool"
 	"github.com/mitchellh/mapstructure"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
@@ -122,6 +122,11 @@ func (e *Env) GetDB() (*gorm.DB, error) {
 func (e *Env) GetPlugin(name string) (p plugin.Plugin, ok bool) {
 	p, ok = e.otherPlugins[name]
 	return
+}
+
+// IsDisable 判断是否禁用
+func (e *Env) IsDisable() bool {
+	return e.disable.Load()
 }
 
 func (e *Env) Toggle(b bool) {

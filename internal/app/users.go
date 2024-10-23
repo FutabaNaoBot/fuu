@@ -46,7 +46,7 @@ func NewUserWithEnv(users Users, env *Env) *UserWithEnv {
 func (g *UserWithEnv) Rule() zero.Rule {
 	rule := g.Users.Rule()
 	return func(ctx *zero.Ctx) bool {
-		if g.env.disable.Load() {
+		if g.env.IsDisable() {
 			return false
 		}
 		return rule(ctx)

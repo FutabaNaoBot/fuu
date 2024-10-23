@@ -2,9 +2,9 @@ package testplugin
 
 import (
 	"fmt"
+	"github.com/kohmebot/kohme/pkg/command"
+	"github.com/kohmebot/kohme/pkg/version"
 	"github.com/kohmebot/plugin"
-	"github.com/kohmebot/plugin/pkg/command"
-	"github.com/kohmebot/plugin/pkg/version"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"time"
 )
