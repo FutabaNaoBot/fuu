@@ -69,24 +69,46 @@ func (e *Env) SuperUser() plugin.Users {
 }
 
 func (e *Env) Error(ctx *zero.Ctx, err error) {
+	if err == nil {
+		return
+	}
 	logrus.Errorf(fmt.Sprintf("[%s] %v", e.p.Name(), err))
 	var msgChain chain.MessageChain
+
+	sendToSuperUsers := func() {
+		for user := range e.superUser.RangeUser {
+			ctx.SendPrivateMessage(user, msgChain)
+		}
+	}
+
+	send := sendToSuperUsers // 默认情况下发送给超级用户
+
+	if ctx.Event != nil {
+		if zero.OnlyGroup(ctx) {
+			// 在群聊中需要reply
+			msgId := ctx.Event.MessageID
+			msgChain.Join(message.Reply(msgId))
+		}
+
+		if ctx.Event.GroupID > 0 {
+			gid := ctx.Event.GroupID
+			send = func() {
+				ctx.SendGroupMessage(gid, msgChain)
+			}
+		} else if ctx.Event.UserID > 0 {
+			uid := ctx.Event.UserID
+			send = func() {
+				ctx.SendPrivateMessage(uid, msgChain)
+			}
+		}
+	}
+
 	msgChain.Split(
 		message.Text(fmt.Sprintf("Oops！%s发生错误了！", e.p.Name())),
 		message.Text(err.Error()),
 	)
-	gopool.Go(func() {
-		defer func() {
-			if recover() == nil {
-				return
-			}
-			e.group.RangeGroup(func(group int64) bool {
-				ctx.SendGroupMessage(group, msgChain)
-				return true
-			})
-		}()
-		ctx.Send(msgChain)
-	})
+
+	gopool.Go(send)
 }
 
 func (e *Env) Get(key string) any {
