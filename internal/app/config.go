@@ -3,10 +3,12 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/kohmebot/plugin"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
 	"gopkg.in/yaml.v3"
 	"os"
+	"slices"
 )
 
 type WsConf struct {
@@ -50,10 +52,11 @@ func (c *AConf) ParseJsonFile(path string) error {
 	return nil
 }
 
+// PluginConf 对应plugins.yaml
 type PluginConf struct {
-	Path    string                    `yaml:"path"`
-	Plugins map[string]map[string]any `yaml:"plugins"`
-	Groups  []int64                   `yaml:"groups"`
+	Path    string        `yaml:"path"`
+	Plugins PluginConfMap `yaml:"plugins"`
+	Groups  []int64       `yaml:"groups"`
 }
 
 func (c *PluginConf) ParseYamlFile(path string) error {
@@ -67,4 +70,41 @@ func (c *PluginConf) ParseYamlFile(path string) error {
 	}
 
 	return nil
+}
+
+// CustomPluginConf 自定义插件配置
+type CustomPluginConf struct {
+	// 决定加载顺序
+	Seq int64 `yaml:"seq"`
+	// 是否排除(不加载)
+	Exclude bool `yaml:"exclude"`
+	// 是否禁用功能(但依旧加载)
+	Disable bool `yaml:"disable"`
+	// 开启的群组
+	Groups []int64 `yaml:"groups"`
+	// 超级管理员列表
+	SuperUsers []int64 `yaml:"super_users"`
+	// 插件自定义conf
+	Conf map[string]any `yaml:"conf"`
+	// 其他不定字段,作为环境变量传入
+	Other map[string]any `yaml:",inline"`
+}
+
+// PluginConfMap 插件配置映射，key为插件名称
+type PluginConfMap map[string]CustomPluginConf
+
+// 过滤不需要加载的插件
+func (mp PluginConfMap) filterInvalidPlugins(plugins []plugin.Plugin) []plugin.Plugin {
+	return slices.DeleteFunc(plugins, func(p plugin.Plugin) bool {
+		return mp[p.Name()].Exclude
+	})
+}
+
+// 根据顺序排序插件
+func (mp PluginConfMap) sortPluginsBySequence(plugins []plugin.Plugin) {
+	slices.SortFunc(plugins, func(a, b plugin.Plugin) int {
+		aSeq := mp[a.Name()].Seq
+		bSeq := mp[b.Name()].Seq
+		return int(aSeq - bSeq)
+	})
 }

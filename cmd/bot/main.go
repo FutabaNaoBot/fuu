@@ -15,14 +15,7 @@ func main() {
 		panic(err)
 	}
 
-	pluginConf := app.PluginConf{
-		Plugins: map[string]map[string]any{
-			"BiliBili-Live": {
-				"conf": map[string]any{
-					"check_duration": 100,
-				},
-			},
-		}}
+	pluginConf := app.PluginConf{}
 
 	err = pluginConf.ParseYamlFile("./conf/plugins.yaml")
 	if err != nil {

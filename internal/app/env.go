@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"github.com/kohmebot/kohme/internal/db"
-	"github.com/kohmebot/kohme/internal/util"
 	"github.com/kohmebot/plugin"
 	"github.com/kohmebot/plugin/pkg/chain"
 	"github.com/kohmebot/plugin/pkg/gopool"
@@ -18,50 +17,28 @@ import (
 )
 
 type Env struct {
-	kv        map[string]any
-	p         plugin.Plugin
-	disable   atomic.Bool
-	superUser Users
-	group     *GroupsWithEnv
+	customConf   CustomPluginConf
+	p            plugin.Plugin
+	otherPlugins map[string]plugin.Plugin
+	disable      atomic.Bool
+	superUser    Users
+	group        *GroupsWithEnv
 }
 
-func NewEnv(p plugin.Plugin, kv map[string]any) *Env {
+func NewEnv(p plugin.Plugin, customConf CustomPluginConf, otherPlugins map[string]plugin.Plugin) *Env {
 	e := &Env{
-		p:  p,
-		kv: kv,
+		p:            p,
+		customConf:   customConf,
+		otherPlugins: otherPlugins,
 	}
-	disable, ok := e.Get("disable").(bool)
-	if ok {
-		e.disable.Store(disable)
-	}
-	e.superUser = kv["super_users"].([]int64)
-	e.group = NewGroupsWithEnv(e.groups(), e)
+	e.disable.Store(customConf.Disable)
+	e.superUser = customConf.SuperUsers
+	e.group = NewGroupsWithEnv(customConf.Groups, e)
 	return e
 }
 
 func (e *Env) Groups() plugin.Groups {
 	return e.group
-}
-
-func (e *Env) groups() Groups {
-	vv := e.kv["groups"]
-	switch res := vv.(type) {
-	case []any:
-		i64s, ok := util.AnySliceToInt64(res)
-		if !ok {
-			break
-		}
-		return i64s
-	case Groups:
-		return res
-	case []int:
-		return util.ToInt64Slice(res)
-	case []int32:
-		return util.ToInt64Slice(res)
-	case []int64:
-		return res
-	}
-	return []int64{}
 }
 
 func (e *Env) SuperUser() plugin.Users {
@@ -112,7 +89,7 @@ func (e *Env) Error(ctx *zero.Ctx, err error) {
 }
 
 func (e *Env) Get(key string) any {
-	return e.kv[key]
+	return e.customConf.Other[key]
 }
 
 func (e *Env) FilePath() (string, error) {
@@ -128,16 +105,7 @@ func (e *Env) RangeBot(yield func(ctx *zero.Ctx) bool) {
 }
 
 func (e *Env) GetConf(conf any) error {
-	v, ok := e.kv["conf"]
-	if !ok {
-		return fmt.Errorf("未找到配置")
-	}
-	vv, ok := v.(map[string]any)
-	if !ok {
-		return fmt.Errorf("conf配置类型错误")
-	}
-
-	if err := mapstructure.Decode(vv, conf); err != nil {
+	if err := mapstructure.Decode(e.customConf.Conf, conf); err != nil {
 		return fmt.Errorf("解析配置错误: %v", err)
 	}
 	return nil
@@ -152,12 +120,7 @@ func (e *Env) GetDB() (*gorm.DB, error) {
 }
 
 func (e *Env) GetPlugin(name string) (p plugin.Plugin, ok bool) {
-	val := e.kv["plugins"]
-	mp, ok := val.(map[string]plugin.Plugin)
-	if !ok {
-		return nil, false
-	}
-	p, ok = mp[name]
+	p, ok = e.otherPlugins[name]
 	return
 }
 

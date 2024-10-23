@@ -42,8 +42,8 @@ func (a *App) Start() error {
 	if err != nil {
 		return err
 	}
-	a.AddPlugin(newCore(a))
-	a.AddPlugin(append(a.opt.DefaultPlugins, ps...)...)
+	a.RegisterPlugins(newCore(a))
+	a.RegisterPlugins(append(a.opt.DefaultPlugins, ps...)...)
 
 	for _, name := range a.pluginNameSeq {
 		p := a.pluginMp[name]
@@ -62,25 +62,59 @@ func (a *App) Start() error {
 
 }
 
-func (a *App) AddPlugin(ps ...plugin.Plugin) {
-	for _, p := range ps {
-		if _, ok := a.pluginMp[p.Name()]; ok {
-			panic(fmt.Sprintf("存在重复名称的插件: %s", p.Name()))
-		}
-		a.pluginMp[p.Name()] = p
-		a.pluginNameSeq = append(a.pluginNameSeq, p.Name())
-		pg, ok := a.opt.PluginConf.Plugins[p.Name()]
-		if !ok || pg == nil {
-			pg = make(map[string]any)
-		}
-		_, ok = pg["groups"]
+// RegisterPlugins 注册插件
+func (a *App) RegisterPlugins(pluginsToAdd ...plugin.Plugin) {
+	// 获取现有插件配置
+	pluginsConfig := a.opt.PluginConf.Plugins
+
+	// 过滤掉不需要加载的
+	filteredPlugins := pluginsConfig.filterInvalidPlugins(pluginsToAdd)
+	// 为加载顺序排序
+	pluginsConfig.sortPluginsBySequence(filteredPlugins)
+
+	// 插入并配置插件
+	for _, p := range filteredPlugins {
+		_, ok := pluginsConfig[p.Name()]
 		if !ok {
-			pg["groups"] = a.opt.PluginConf.Groups
+			logrus.Warnf("插件 %s 的配置不存在,将使用默认配置", p.Name())
 		}
-		pg["super_users"] = a.opt.AppConf.Zero.SuperUsers
-		pg["plugins"] = a.pluginMp
-		a.envMp[p.Name()] = NewEnv(p, pg)
+		a.addPlugin(p)
 	}
+}
+
+// 添加并配置单个插件
+func (a *App) addPlugin(p plugin.Plugin) {
+	// 检查插件是否已存在
+	if _, exists := a.pluginMp[p.Name()]; exists {
+		panic(fmt.Sprintf("存在重复名称的插件: %s", p.Name()))
+	}
+
+	// 插件注册
+	a.pluginMp[p.Name()] = p
+	a.pluginNameSeq = append(a.pluginNameSeq, p.Name())
+
+	// 配置插件环境
+	a.envMp[p.Name()] = a.configurePluginEnv(p)
+}
+
+// 配置插件环境
+func (a *App) configurePluginEnv(p plugin.Plugin) *Env {
+	customConf := a.opt.PluginConf.Plugins[p.Name()]
+	if customConf.Conf == nil {
+		customConf.Conf = make(map[string]any)
+	}
+	if customConf.Other == nil {
+		customConf.Other = make(map[string]any)
+	}
+	// 如果不存在插件自定配置启用的群，则使用全局配置
+	if len(customConf.Groups) <= 0 {
+		customConf.Groups = a.opt.PluginConf.Groups
+	}
+	// 同理
+	if len(customConf.SuperUsers) <= 0 {
+		customConf.SuperUsers = a.opt.AppConf.Zero.SuperUsers
+	}
+	return NewEnv(p, customConf, a.pluginMp)
 }
 
 func (a *App) PrintPlugins() {
