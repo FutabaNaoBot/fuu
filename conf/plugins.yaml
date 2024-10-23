@@ -1,9 +1,0 @@
-path: ./plugins
-groups: []
-plugins:
-  core:
-   conf:
-     # 帮助
-     help_top: 下面是我的所有本领！
-     help_tail: 更多本领绝赞学习中,加入github.com/KohmeBot来教会我吧！
-
