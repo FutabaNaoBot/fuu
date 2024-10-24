@@ -2,18 +2,22 @@ package app
 
 import (
 	"fmt"
+	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/kohmebot/kohme/pkg/chain"
 	"github.com/kohmebot/kohme/pkg/command"
 	"github.com/kohmebot/kohme/pkg/gopool"
 	"github.com/kohmebot/kohme/pkg/version"
 	"github.com/kohmebot/plugin"
+	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/extension"
 	"github.com/wdvxdr1123/ZeroBot/message"
+	"gorm.io/gorm"
 	"strings"
+	"time"
 )
 
-var v = version.NewVersion(0, 0, 30)
+var v = version.NewVersion(0, 0, 40)
 
 type CoreConf struct {
 	HelpTop  string `yaml:"help_top" mapstructure:"help_top"`
@@ -23,6 +27,8 @@ type CoreConf struct {
 type Core struct {
 	app  *App
 	conf CoreConf
+	db   *gorm.DB
+	env  plugin.Env
 }
 
 func newCore(a *App) *Core {
@@ -32,8 +38,16 @@ func newCore(a *App) *Core {
 }
 
 func (c *Core) Init(engine *zero.Engine, env plugin.Env) error {
-
+	c.env = env
 	err := env.GetConf(&c.conf)
+	if err != nil {
+		return err
+	}
+	c.db, err = env.GetDB()
+	if err != nil {
+		return err
+	}
+	err = c.db.AutoMigrate(&PluginRecord{})
 	if err != nil {
 		return err
 	}
@@ -176,5 +190,118 @@ func (c *Core) Version() uint64 {
 }
 
 func (c *Core) OnBoot() {
+	var err error
+	defer func() {
+		if err != nil {
+			logrus.Errorf("查询插件校验错误: %s", err.Error())
+		}
+	}()
+	initPluginSet := mapset.NewSet[string]()
+	initPluginSet.Append(c.app.pluginNameSeq...)
+	var records []PluginRecord
+	if err = c.db.Find(&records).Error; err != nil {
+		return
+	}
+	historyPluginMp := make(map[string]PluginRecord, len(records))
+	historyPluginSet := mapset.NewSet[string]()
+	for _, record := range records {
+		historyPluginMp[record.Name] = record
+		historyPluginSet.Add(record.Name)
+	}
+	// 查看是否有新加载的插件
+	var newPlugins []plugin.Plugin
+	initPluginSet.Difference(historyPluginSet).Each(func(s string) bool {
+		newPlugins = append(newPlugins, c.app.pluginMp[s])
+		return true
+	})
+
+	// 查看是否有卸载的插件
+	var deletePlugins []string // 卸载的插件只能用string表示
+	historyPluginSet.Difference(initPluginSet).Each(func(s string) bool {
+		deletePlugins = append(deletePlugins, s)
+		return true
+	})
+
+	// 查看是否有版本变动的插件
+	var updatePlugins []plugin.Plugin
+	initPluginSet.Intersect(historyPluginSet).Each(func(s string) bool {
+		r := historyPluginMp[s]
+		if r.Version != c.app.pluginMp[s].Version() {
+			updatePlugins = append(updatePlugins, c.app.pluginMp[s])
+		}
+		return true
+	})
+	err = c.db.Transaction(func(tx *gorm.DB) error {
+		// 删除记录中已卸载的插件
+		if len(deletePlugins) > 0 {
+			if err = c.db.Where("name IN ?", deletePlugins).Delete(&PluginRecord{}).Error; err != nil {
+				return err
+			}
+		}
+		if len(newPlugins) > 0 {
+			// 插入新的插件
+			if err = c.db.Create(PluginsToRecord(newPlugins)).Error; err != nil {
+				return err
+			}
+		}
+		if len(updatePlugins) > 0 {
+			// 更新插件版本
+			for _, record := range PluginsToRecord(updatePlugins) {
+				if err = c.db.Save(&record).Error; err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return
+	}
+
+	var builder strings.Builder
+	builder.WriteString(fmt.Sprintf("[%s]\nKohmeBot已启动\n", time.Now().Format("2006-01-02 15:04:05")))
+	if len(c.app.pluginNameSeq) > 0 {
+		builder.WriteString("已加载插件:\n")
+		for _, s := range c.app.pluginNameSeq {
+			p := c.app.pluginMp[s]
+			builder.WriteString(fmt.Sprintf("[%s] v%s\n", p.Name(), version.Version(p.Version())))
+		}
+	}
+	if len(newPlugins) > 0 {
+		builder.WriteString("新插件:\n")
+		for _, p := range newPlugins {
+			builder.WriteString(fmt.Sprintf("[%s] v%s\n", p.Name(), version.Version(p.Version())))
+		}
+	}
+	if len(deletePlugins) > 0 {
+		builder.WriteString("卸载插件:\n")
+		for _, s := range deletePlugins {
+			r := historyPluginMp[s]
+			builder.WriteString(fmt.Sprintf("[%s] v%s\n", r.Name, version.Version(r.Version)))
+		}
+	}
+	if len(updatePlugins) > 0 {
+		builder.WriteString("版本变动:\n")
+		for _, p := range updatePlugins {
+			hp := historyPluginMp[p.Name()]
+			var w string
+			if p.Version() > hp.Version {
+				w = "版本更新"
+			} else {
+				w = "版本回退"
+			}
+			builder.WriteString(fmt.Sprintf("[%s] %s v%s -> v%s\n", p.Name(), w, version.Version(hp.Version), version.Version(p.Version())))
+		}
+	}
+	logrus.Info(builder.String())
+	msg := message.Text(builder.String())
+	for ctx := range c.env.RangeBot {
+		for u := range c.env.SuperUser().RangeUser {
+			gopool.Go(func() {
+				ctx.SendPrivateMessage(u, msg)
+			})
+		}
+	}
 
 }
