@@ -212,14 +212,15 @@ func (c *Core) OnBoot() {
 	var newPlugins []plugin.Plugin
 	initPluginSet.Difference(historyPluginSet).Each(func(s string) bool {
 		newPlugins = append(newPlugins, c.app.pluginMp[s])
-		return true
+		// 返回false才是继续迭代
+		return false
 	})
 
 	// 查看是否有卸载的插件
 	var deletePlugins []string // 卸载的插件只能用string表示
 	historyPluginSet.Difference(initPluginSet).Each(func(s string) bool {
 		deletePlugins = append(deletePlugins, s)
-		return true
+		return false
 	})
 
 	// 查看是否有版本变动的插件
@@ -229,7 +230,7 @@ func (c *Core) OnBoot() {
 		if r.Version != c.app.pluginMp[s].Version() {
 			updatePlugins = append(updatePlugins, c.app.pluginMp[s])
 		}
-		return true
+		return false
 	})
 	err = c.db.Transaction(func(tx *gorm.DB) error {
 		// 删除记录中已卸载的插件
@@ -263,9 +264,9 @@ func (c *Core) OnBoot() {
 	builder.WriteString(fmt.Sprintf("[%s]\nKohmeBot已启动\n", time.Now().Format("2006-01-02 15:04:05")))
 	if len(c.app.pluginNameSeq) > 0 {
 		builder.WriteString("已加载插件:\n")
-		for _, s := range c.app.pluginNameSeq {
+		for idx, s := range c.app.pluginNameSeq {
 			p := c.app.pluginMp[s]
-			builder.WriteString(fmt.Sprintf("[%s] v%s\n", p.Name(), version.Version(p.Version())))
+			builder.WriteString(fmt.Sprintf("(%d) [%s] v%s\n", idx+1, p.Name(), version.Version(p.Version())))
 		}
 	}
 	if len(newPlugins) > 0 {
